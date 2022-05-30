@@ -17,3 +17,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::apiResource('/users', 'Api\UserController');
+Route::apiResource('/guru', 'Api\GuruController');
+Route::apiResource('/mapel', 'Api\MapelController');
+Route::apiResource('/kelas', 'Api\KelasController')->parameters(['kelas' => 'kelas']);
+Route::apiResource('/siswa', 'Api\SiswaController');
+Route::apiResource('/jadwal', 'Api\JadwalController');
