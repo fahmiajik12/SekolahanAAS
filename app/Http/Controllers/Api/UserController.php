@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\User;
+use App\Model\Guru;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
+use JWTAuth;
 
 class UserController extends Controller
 {
@@ -115,6 +117,20 @@ class UserController extends Controller
         } else {
             return $this->failedResponse('User gagal dihapus!',500);
         }
+    }
+
+    public function cek_token()
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+        
+        return $this->success($user,200);
+    }
+
+    public function get_user_guru()
+    {
+        $data = User::where('type','guru')->whereNotIn('id',Guru::pluck('user_id'))->get();
+
+        return $this->success($data,200);
     }
 
     private function success($data,$statusCode,$message='success')

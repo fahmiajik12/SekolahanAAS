@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Model\Jadwal;
+use App\Model\Siswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -16,9 +17,18 @@ class JadwalController extends Controller
      */
     public function index()
     {
-        $jadwal = Jadwal::all();
+        $jadwals = Jadwal::join('kelas','kelas.id','=','jadwal.kelas_id')
+                            ->join('mapel','mapel.id','=','jadwal.mapel_id')
+                            ->join('guru','guru.id','=','jadwal.guru_id')
+                            ->select([
+                                'jadwal.id',
+                                'jadwal.hari',
+                                'guru.nama',
+                                'mapel.nama_mapel',
+                                'kelas.nama_kelas'
+                            ])->get();
 
-        return $this->success($jadwal,200);
+        return $this->success($jadwals,200);
     }
 
     /**
@@ -121,6 +131,20 @@ class JadwalController extends Controller
         } else {
             return $this->failedResponse('Jadwal gagal dihapus!',500);
         }
+    }
+
+    public function get_siswa(Jadwal $jadwal)
+    {
+        $data = Siswa::join('kelas','kelas.id','=','siswa.kelas_id')
+                        ->join('jadwal','jadwal.kelas_id','=','kelas.id')
+                        ->where('jadwal.id','=',$jadwal->id)
+                        ->select([
+                            'siswa.id',
+                            'siswa.nama',
+                            'kelas.nama_kelas'
+                        ])
+                        ->get();
+        return $this->success($data, 200);
     }
 
     private function success($data,$statusCode,$message='success')
